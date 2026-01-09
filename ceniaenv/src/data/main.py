@@ -9,7 +9,7 @@ pd.set_option('display.max_columns', None)
 #---------------------------------- 
 
 #Importar dataset 
-penguin_dataset = pd.read_csv("ceniaenv/data/penguins_size.csv")
+penguin_dataset = pd.read_csv("ceniaenv/src/data/penguins_size.csv")
 #print(penguin_dataset.head())
 
 #Seleccionar las columnas que se usarán
