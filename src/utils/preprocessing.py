@@ -11,7 +11,3 @@ def remove_nulls(df):
 def check_duplicates(df):
     """Revisa y devuelve el número de filas duplicadas en el DataFrame."""
     return df.duplicated().sum()
-
-def get_unique_values(df, columns):
-    """Devuelve los valores únicos de las columnas categóricas."""
-    return {col: df[col].unique() for col in columns}
