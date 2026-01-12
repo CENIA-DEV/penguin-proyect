@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier # Import Decision Tree Classifier
+from sklearn.model_selection import train_test_split # Import train_test_split function
+from sklearn import metrics #Import scikit-learn metrics module for accuracy calculation
 
 pd.set_option('display.max_columns', None)
 #----------------------------------
@@ -77,9 +80,14 @@ species_mapping = {'Adelie': 0, 'Chinstrap': 1, 'Gentoo': 2}
 encoded_df['species_num'] = encoded_df['species'].map(species_mapping)
 print('Datos con etiquetas numéricas para species_num:\n{0}\n'.format(encoded_df.sample(10)))
 
+#Separar en características y target
+feature_cols = ['culmen_length_mm', 'culmen_depth_mm', 'flipper_length_mm',
+       'body_mass_g', 'island_Biscoe', 'island_Dream', 'island_Torgersen',
+       'sex_.', 'sex_FEMALE', 'sex_MALE', 'species_num']
+
+X = encoded_df[feature_cols] # Características
+y = encoded_df['species'] # Target
 
 #Dividir el dataset en entrenamiento, validación y prueba
-train, validate, test = np.split(encoded_df.sample(frac=1, random_state=42), [int(.6*len(encoded_df)), int(.8*len(encoded_df))])
-print('Tamaño del conjunto de entrenamiento: {0}'.format(len(train)))
-print('Tamaño del conjunto de validación: {0}'.format(len(validate)))
-print('Tamaño del conjunto de prueba: {0}\n'.format(len(test)))
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
