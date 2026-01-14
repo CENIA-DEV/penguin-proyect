@@ -1,10 +1,14 @@
-import joblib
 import os
+import joblib
 from typing import Dict, Any
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score
-
+from src.utils.constants import (
+    DATASET_FILE_PATH, CATEGORICAL_COLUMNS, 
+    SPECIES_MAPPING, SPECIES_INVERSE_MAPPING)
+from src.utils.preprocessing import load_dataset, remove_nulls
+from src.utils.normalization import normalize_dataframe, one_hot_encode, map_categorical_to_numeric
 
 MODEL_SAVE_PATH = 'models/trained_model.pkl'
 ENCODER_SAVE_PATH = 'models/label_mapping.pkl'  #guarda SPECIES_INVERSE_MAPPING 
@@ -46,4 +50,29 @@ def run_training(df, species_inverse_mapping: Dict[int, str]) -> Dict[str, Any]:
 
     return {"status": "success", "training_samples": len(X_train), "test_samples": len(X_test), "metrics": eval_metrics}
 
+
+#------------------
+#.     API
+#------------------
+
+def train_api():
+    """Función para entrenar el modelo desde una API endpoint."""
+    #Cargar y limpiar datos
+    df = load_dataset(DATASET_FILE_PATH)
+    df = df[df['sex'].isin(['MALE', 'FEMALE'])]
+    df = df[['species', 'culmen_length_mm', 'culmen_depth_mm', 'flipper_length_mm', 'body_mass_g', 'sex']]
+    df = remove_nulls(df)
+
+    #Normalizar
+    df, feature_mean, feature_std = normalize_dataframe(df)
+    joblib.dump((feature_mean, feature_std), 'models/normalization_params.pkl')
+
+    #Codificar
+    df['sex'] = df['sex'].astype(str)
+    df = one_hot_encode(df, CATEGORICAL_COLUMNS)
+    df = map_categorical_to_numeric(df, 'species', SPECIES_MAPPING)
+
+    #Entrenar modelo
+    results = run_training(df, SPECIES_INVERSE_MAPPING)
+    return results
 

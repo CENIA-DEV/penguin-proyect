@@ -14,9 +14,11 @@ ENCODER_PATH = 'models/label_mapping.pkl'  #ruta del mapeo invers
 def load_test_data():
     """Carga el conjunto de datos de prueba y el modelo entrenado."""
     test_df = load_dataset(DATASET_FILE_PATH) #ruta del dataset de prueba
+    test_df = test_df[test_df['sex'].isin(['MALE', 'FEMALE'])]
     test_df = test_df[['species', 'culmen_length_mm', 'culmen_depth_mm', 'flipper_length_mm', 'body_mass_g', 'sex']]
     test_df = remove_nulls(test_df)
-    test_df = normalize_dataframe(test_df)
+    test_df, _, _ = normalize_dataframe(test_df)
+    test_df['sex'] = test_df['sex'].astype(str)
     test_df = one_hot_encode(test_df, CATEGORICAL_COLUMNS)
     test_df = map_categorical_to_numeric(test_df, 'species', SPECIES_MAPPING)
 
