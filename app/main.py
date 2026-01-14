@@ -46,3 +46,7 @@ def test_api():
         return {"message": "evaluación completada exitosamente", "metrics": metrics}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))    
+    
+@app.get("/health")
+def health_check():
+    return {"status": "API is running"}
