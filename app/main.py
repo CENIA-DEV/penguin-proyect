@@ -12,6 +12,21 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# ruta raíz
+@app.get("/")
+def read_root():
+    return {
+        "message": "Bienvenido a Penguin Species Prediction API",
+        "version": "1.0.0",
+        "endpoints": {
+            "docs": "/docs",
+            "health": "/health",
+            "predict": "/predict",
+            "train": "/train",
+            "test": "/test"
+        }
+    }
+
 # crear clase de modelo de datos para la entrada
 class PenguinFeatures(BaseModel):
     culmen_length_mm: float
@@ -20,15 +35,11 @@ class PenguinFeatures(BaseModel):
     body_mass_g: int
     sex: str
 
-# definir endpoint de predicción
-@app.post("/predict")
-def predict_penguin_species(features: PenguinFeatures):
-    try:
-        result = predict_species(features.model_dump())
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+@app.get("/health")
+def health_check():
+    return {"status": "API is running"}
 
+# definir endpoint de predicción
 # definir endpoint de entrenamiento
 @app.post("/train")
 def train_model():
@@ -47,6 +58,11 @@ def test_api():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))    
     
-@app.get("/health")
-def health_check():
-    return {"status": "API is running"}
+
+@app.post("/predict")
+def predict_penguin_species(features: PenguinFeatures):
+    try:
+        result = predict_species(features.model_dump())
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
